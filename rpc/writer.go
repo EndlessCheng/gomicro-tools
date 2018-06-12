@@ -23,6 +23,15 @@ func mapGoTypeToProtoType(goTypeName string) string {
 	}
 }
 
+func mapGoNameToProtoName(goName string) string {
+	switch goName {
+	case "err":
+		return "errCode"
+	default:
+		return goName
+	}
+}
+
 func writeService(w *bufio.Writer, serviceName string, methods []*Method) {
 	w.WriteString(fmt.Sprintf("service %s {\n", serviceName))
 	for _, method := range methods {
@@ -38,7 +47,7 @@ func writeMessage(w *bufio.Writer, messageType string, parameters []*Var) {
 		if parameter.IsSlice {
 			w.WriteString("repeated ")
 		}
-		w.WriteString(fmt.Sprintf("%s %s = %d;\n", mapGoTypeToProtoType(parameter.Type), parameter.Name, i+1))
+		w.WriteString(fmt.Sprintf("%s %s = %d;\n", mapGoTypeToProtoType(parameter.Type), mapGoNameToProtoName(parameter.Name), i+1))
 	}
 	w.WriteString("}\n")
 }
