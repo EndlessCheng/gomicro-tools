@@ -6,36 +6,15 @@ import (
 	"os"
 	"strings"
 	"path/filepath"
+	"path"
 )
-
-var tab = strings.Repeat(" ", 4)
-
-func mapGoTypeToProtoType(goTypeName string) string {
-	switch goTypeName {
-	case "int":
-		return "int64"
-	case "uint":
-		return "uint64"
-	case "error":
-		return "int32"
-	default:
-		return goTypeName
-	}
-}
-
-func mapGoNameToProtoName(goName string) string {
-	switch goName {
-	case "err":
-		return "errCode"
-	default:
-		return goName
-	}
-}
 
 func writeService(w *bufio.Writer, serviceName string, methods []*Method) {
 	w.WriteString(fmt.Sprintf("service %s {\n", serviceName))
 	for _, method := range methods {
-		w.WriteString(fmt.Sprintf("%srpc %[2]s (Req%[2]s) returns (Resp%[2]s);\n", tab, method.MethodName))
+		reqMsgType := requestMessageType(method.MethodName)
+		respMsgType := responseMessageType(method.MethodName)
+		w.WriteString(fmt.Sprintf("%srpc %s (%s) returns (%s);\n", tab, method.MethodName, reqMsgType, respMsgType))
 	}
 	w.WriteString("}\n")
 }
@@ -53,6 +32,9 @@ func writeMessage(w *bufio.Writer, messageType string, parameters []*Var) {
 }
 
 func genRpc(rpcFilePath string, parsedMethods []*Method) {
+	err := os.MkdirAll(path.Dir(rpcFilePath), os.ModePerm)
+	check(err)
+
 	f, err := os.Create(rpcFilePath)
 	check(err)
 	defer f.Close()
@@ -68,9 +50,9 @@ func genRpc(rpcFilePath string, parsedMethods []*Method) {
 
 	for _, method := range parsedMethods {
 		w.WriteString("\n")
-		writeMessage(w, "Req"+method.MethodName, method.Parameters)
+		writeMessage(w, requestMessageType(method.MethodName), method.Parameters)
 		w.WriteString("\n")
-		writeMessage(w, "Resp"+method.MethodName, method.Returns)
+		writeMessage(w, responseMessageType(method.MethodName), method.Returns)
 	}
 
 	w.Flush()

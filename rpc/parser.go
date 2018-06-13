@@ -28,21 +28,36 @@ type Struct struct {
 	Members    []*Var
 }
 
+// TODO: matrix
 func parseType(typeExpr ast.Expr) (string, bool) {
+	// int, string, ...
 	ident, ok := typeExpr.(*ast.Ident)
 	if ok {
 		return ident.Name, false
 	}
 
+	// *xxx
+	starExpr, ok := typeExpr.(*ast.StarExpr)
+	if ok {
+		typeName, _ := parseType(starExpr.X)
+		return typeName, false
+	}
+
+	// []xxx
 	arrayType, ok := typeExpr.(*ast.ArrayType)
 	if ok {
 		typeName, _ := parseType(arrayType.Elt)
-		// TODO: matrix
 		return typeName, true
 	}
 
-	//panic(typeExpr)
-	return "", false
+	// pkg.SomeType
+	selectorExpr, ok := typeExpr.(*ast.SelectorExpr)
+	if ok {
+		return selectorExpr.Sel.Name, false
+	}
+
+	// ?
+	panic(typeExpr)
 }
 
 func parseFieldList(fieldList []*ast.Field) []*Var {
