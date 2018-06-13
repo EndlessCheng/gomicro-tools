@@ -12,9 +12,9 @@ import (
 func writeService(w *bufio.Writer, serviceName string, methods []*Method) {
 	w.WriteString(fmt.Sprintf("service %s {\n", serviceName))
 	for _, method := range methods {
-		reqMsgType := requestMessageType(method.MethodName)
-		respMsgType := responseMessageType(method.MethodName)
-		w.WriteString(fmt.Sprintf("%srpc %s (%s) returns (%s);\n", tab, method.MethodName, reqMsgType, respMsgType))
+		reqMsgType := requestMessageType(method.Name)
+		respMsgType := responseMessageType(method.Name)
+		w.WriteString(fmt.Sprintf("%srpc %s (%s) returns (%s);\n", tab, method.Name, reqMsgType, respMsgType))
 	}
 	w.WriteString("}\n")
 }
@@ -31,29 +31,50 @@ func writeMessage(w *bufio.Writer, messageType string, parameters []*Var) {
 	w.WriteString("}\n")
 }
 
-func genProto(rpcFilePath string, parsedMethods []*Method) {
-	err := os.MkdirAll(path.Dir(rpcFilePath), os.ModePerm)
+func createFile(filePath string) *os.File {
+	err := os.MkdirAll(path.Dir(filePath), os.ModePerm)
 	check(err)
 
-	f, err := os.Create(rpcFilePath)
+	f, err := os.Create(filePath)
 	check(err)
+
+	return f
+}
+
+func genProto(protoFilePath string, parsedMethods []*Method) {
+	f := createFile(protoFilePath)
 	defer f.Close()
 
 	w := bufio.NewWriter(f)
-	_, err = w.WriteString("syntax = \"proto3\";\n\npackage proto;\n\n")
+	_, err := w.WriteString("syntax = \"proto3\";\n\npackage proto;\n\n")
 	check(err)
 
-	serviceName := filepath.Base(rpcFilePath)
+	serviceName := filepath.Base(protoFilePath)
 	serviceName = strings.TrimSuffix(serviceName, filepath.Ext(serviceName))
 	serviceName = strings.Title(serviceName)
 	writeService(w, serviceName, parsedMethods)
 
 	for _, method := range parsedMethods {
 		w.WriteString("\n")
-		writeMessage(w, requestMessageType(method.MethodName), method.Parameters)
+		writeMessage(w, requestMessageType(method.Name), method.Parameters)
 		w.WriteString("\n")
-		writeMessage(w, responseMessageType(method.MethodName), method.Returns)
+		writeMessage(w, responseMessageType(method.Name), method.Returns)
 	}
 
-	w.Flush()
+	err = w.Flush()
+	check(err)
+}
+
+func genMessages(protoFilePath string, parsedStructs []*Struct) {
+	f := createFile(protoFilePath)
+	defer f.Close()
+
+	w := bufio.NewWriter(f)
+	for _, parsedStruct := range parsedStructs {
+		writeMessage(w, parsedStruct.Name, parsedStruct.Members)
+		w.WriteString("\n")
+	}
+
+	err := w.Flush()
+	check(err)
 }

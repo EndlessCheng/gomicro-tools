@@ -13,19 +13,19 @@ type Var struct {
 }
 
 type Method struct {
-	MethodName string
+	Name       string
 	Parameters []*Var
 	Returns    []*Var
 }
 
 type InterFace struct {
-	InterFaceName string
-	Methods       []*Method
+	Name    string
+	Methods []*Method
 }
 
 type Struct struct {
-	StructName string
-	Members    []*Var
+	Name    string
+	Members []*Var
 }
 
 // TODO: matrix
@@ -74,11 +74,17 @@ func parseFieldList(fieldList []*ast.Field) []*Var {
 	return vars
 }
 
-func parseInterface(sourceCode string) *InterFace {
+func genAstFile(sourceCode string) *ast.File {
 	fset := token.NewFileSet() // positions are relative to fset
 
 	f, err := parser.ParseFile(fset, "", sourceCode, 0)
 	check(err)
+
+	return f
+}
+
+func parseInterface(sourceCode string) *InterFace {
+	f := genAstFile(sourceCode)
 
 	for _, v := range f.Scope.Objects {
 		typeSpec, ok := v.Decl.(*ast.TypeSpec)
@@ -90,6 +96,8 @@ func parseInterface(sourceCode string) *InterFace {
 		if !ok {
 			continue
 		}
+
+		interfaceName := typeSpec.Name.Name
 
 		methodFieldList := interfaceType.Methods.List
 		parsedMethods := make([]*Method, len(methodFieldList))
@@ -109,12 +117,33 @@ func parseInterface(sourceCode string) *InterFace {
 			}
 		}
 
-		return &InterFace{v.Name, parsedMethods}
+		return &InterFace{interfaceName, parsedMethods}
 	}
 
 	return nil
 }
 
-func parseStruct(srcFilePath string) *Struct {
-	return nil
+func parseStructs(sourceCode string) []*Struct {
+	f := genAstFile(sourceCode)
+
+	var parsedStructs []*Struct
+	for _, v := range f.Scope.Objects {
+		typeSpec, ok := v.Decl.(*ast.TypeSpec)
+		if !ok {
+			continue
+		}
+
+		structType, ok := typeSpec.Type.(*ast.StructType)
+		if !ok {
+			continue
+		}
+
+		structName := typeSpec.Name.Name
+
+		structFieldList := structType.Fields.List
+		members := parseFieldList(structFieldList)
+
+		parsedStructs = append(parsedStructs, &Struct{structName,members})
+	}
+	return parsedStructs
 }

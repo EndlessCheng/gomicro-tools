@@ -12,5 +12,6 @@
 *.out
 
 .idea/
+src/
 out/
 *.txt
