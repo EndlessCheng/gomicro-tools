@@ -31,7 +31,7 @@ func writeMessage(w *bufio.Writer, messageType string, parameters []*Var) {
 	w.WriteString("}\n")
 }
 
-func genRpc(rpcFilePath string, parsedMethods []*Method) {
+func genProto(rpcFilePath string, parsedMethods []*Method) {
 	err := os.MkdirAll(path.Dir(rpcFilePath), os.ModePerm)
 	check(err)
 

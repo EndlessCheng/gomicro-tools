@@ -50,7 +50,7 @@ func parseType(typeExpr ast.Expr) (string, bool) {
 		return typeName, true
 	}
 
-	// pkg.SomeType
+	// pkg.Foo
 	selectorExpr, ok := typeExpr.(*ast.SelectorExpr)
 	if ok {
 		return selectorExpr.Sel.Name, false
