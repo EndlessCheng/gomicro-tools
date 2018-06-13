@@ -1,24 +1,19 @@
 package rpc
 
-import "io/ioutil"
-
-func readText(srcFilePath string) string {
-	data, err := ioutil.ReadFile(srcFilePath)
-	check(err)
-
-	return string(data)
-}
+import (
+	"gomicro-tools/common"
+)
 
 func GenProto(srcFilePath string, dstProtoFilePath string) {
-	sourceCode := readText(srcFilePath)
-	parsedInterface := parseInterface(sourceCode)
+	sourceCode := common.ReadText(srcFilePath)
+	parsedInterface := ParseInterface(sourceCode)
 	if parsedInterface != nil {
 		genProto(dstProtoFilePath, parsedInterface.Methods)
 	}
 }
 
 func GenMessages(srcFilePath string, dstProtoFilePath string) {
-	sourceCode := readText(srcFilePath)
+	sourceCode := common.ReadText(srcFilePath)
 	parsedStructs := parseStructs(sourceCode)
 	if parsedStructs != nil {
 		genMessages(dstProtoFilePath, parsedStructs)

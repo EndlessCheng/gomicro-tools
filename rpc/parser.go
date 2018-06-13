@@ -4,6 +4,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"gomicro-tools/common"
 )
 
 type Var struct {
@@ -78,12 +79,12 @@ func genAstFile(sourceCode string) *ast.File {
 	fset := token.NewFileSet() // positions are relative to fset
 
 	f, err := parser.ParseFile(fset, "", sourceCode, 0)
-	check(err)
+	common.Check(err)
 
 	return f
 }
 
-func parseInterface(sourceCode string) *InterFace {
+func ParseInterface(sourceCode string) *InterFace {
 	f := genAstFile(sourceCode)
 
 	for _, v := range f.Scope.Objects {
