@@ -10,10 +10,9 @@ import (
 )
 
 var (
-	serviceName string
+	serviceName      string
 	serviceNameUpper string
 )
-
 
 func writeVar(w *bufio.Writer, v *rpc.Var) {
 	vName := v.Name
@@ -130,8 +129,7 @@ func genRepository(dstFilePath string, parsedInterface *rpc.InterFace, dstName s
 
 	w := bufio.NewWriter(f)
 
-	_, err := w.WriteString(`
-package repository
+	_, err := w.WriteString(`package repository
 
 import (
 	"context"
@@ -149,14 +147,14 @@ import (
 	implStructName := serviceName + "SvcRepository"
 	w.WriteString(fmt.Sprintf(`
 func New%[1]sSvcRepository() %[1]sSvcRepository {
-// TODO
+	// TODO
 }
 
 type %s struct {
-%sclient proto.%[1]sService
+	client proto.%[1]sService
 }
 
-`, serviceNameUpper, implStructName, common.Tab))
+`, serviceNameUpper, implStructName))
 
 	for _, method := range parsedInterface.Methods {
 		writeMethod(w, implStructName, method)
