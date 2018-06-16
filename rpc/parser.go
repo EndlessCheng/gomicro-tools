@@ -44,7 +44,7 @@ func parseType(typeExpr ast.Expr) (string, bool) {
 	case *ast.SelectorExpr: // pkg.Foo, 返回 Foo
 		return expr.Sel.Name, false
 	default:
-		panic(fmt.Sprintf("unexcepted type %T: %v", expr, expr))
+		panic(fmt.Sprintf("unexcepted type %[1]T: %[1]v (%#[1]v)", expr))
 	}
 }
 
