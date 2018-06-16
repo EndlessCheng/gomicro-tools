@@ -32,28 +32,24 @@ type Struct struct {
 // TODO: matrix
 func parseType(typeExpr ast.Expr) (string, bool) {
 	// int, string, ...
-	ident, ok := typeExpr.(*ast.Ident)
-	if ok {
+	if ident, ok := typeExpr.(*ast.Ident); ok {
 		return ident.Name, false
 	}
 
 	// *xxx
-	starExpr, ok := typeExpr.(*ast.StarExpr)
-	if ok {
+	if starExpr, ok := typeExpr.(*ast.StarExpr); ok {
 		typeName, _ := parseType(starExpr.X)
 		return typeName, false
 	}
 
 	// []xxx
-	arrayType, ok := typeExpr.(*ast.ArrayType)
-	if ok {
+	if arrayType, ok := typeExpr.(*ast.ArrayType); ok {
 		typeName, _ := parseType(arrayType.Elt)
 		return typeName, true
 	}
 
 	// pkg.Foo
-	selectorExpr, ok := typeExpr.(*ast.SelectorExpr)
-	if ok {
+	if selectorExpr, ok := typeExpr.(*ast.SelectorExpr); ok {
 		return selectorExpr.Sel.Name, false
 	}
 
