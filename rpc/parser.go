@@ -5,6 +5,7 @@ import (
 	"go/parser"
 	"go/token"
 	"gomicro-tools/common"
+	"fmt"
 )
 
 type Var struct {
@@ -31,30 +32,20 @@ type Struct struct {
 
 // TODO: matrix
 func parseType(typeExpr ast.Expr) (string, bool) {
-	// int, string, ...
-	if ident, ok := typeExpr.(*ast.Ident); ok {
-		return ident.Name, false
-	}
-
-	// *xxx
-	if starExpr, ok := typeExpr.(*ast.StarExpr); ok {
-		typeName, _ := parseType(starExpr.X)
+	switch expr := typeExpr.(type) {
+	case *ast.Ident: // int, string, error, ...
+		return expr.Name, false
+	case *ast.StarExpr: // *xxx
+		typeName, _ := parseType(expr.X)
 		return typeName, false
-	}
-
-	// []xxx
-	if arrayType, ok := typeExpr.(*ast.ArrayType); ok {
-		typeName, _ := parseType(arrayType.Elt)
+	case *ast.ArrayType: // []xxx
+		typeName, _ := parseType(expr.Elt)
 		return typeName, true
+	case *ast.SelectorExpr: // pkg.Foo, 返回 Foo
+		return expr.Sel.Name, false
+	default:
+		panic(fmt.Sprintf("unexcepted type %T: %v", expr, expr))
 	}
-
-	// pkg.Foo
-	if selectorExpr, ok := typeExpr.(*ast.SelectorExpr); ok {
-		return selectorExpr.Sel.Name, false
-	}
-
-	// ?
-	panic(typeExpr)
 }
 
 func parseFieldList(fieldList []*ast.Field) []*Var {
@@ -140,7 +131,7 @@ func parseStructs(sourceCode string) []*Struct {
 		structFieldList := structType.Fields.List
 		members := parseFieldList(structFieldList)
 
-		parsedStructs = append(parsedStructs, &Struct{structName,members})
+		parsedStructs = append(parsedStructs, &Struct{structName, members})
 	}
 	return parsedStructs
 }
