@@ -54,7 +54,7 @@ func writeResponseAssign(w *bufio.Writer, returns []*rpc.Var) {
 func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 	reqType := rpc.RequestMessageType(method.Name)
 	respType := rpc.ResponseMessageType(method.Name)
-	w.WriteString(fmt.Sprintf("func (h *%s) %s(ctx context.Context, req *proto.%s, resp *proto.%s) error {\n",
+	w.WriteString(fmt.Sprintf("func (h *%s) %s(ctx context.Context, req *proto.%s) (*proto.%s, error) {\n",
 		structName, method.Name, reqType, respType))
 
 	w.WriteString(common.Tab)
@@ -62,6 +62,8 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 	w.WriteString(fmt.Sprintf(" := h.ucase.%s(", method.Name))
 	writeUseCaseParams(w, method.Parameters)
 	w.WriteString(")\n")
+
+	w.WriteString(common.Tab + fmt.Sprintf("resp := proto.%s{}\n", respType))
 
 	w.WriteString(common.Tab + "resp.ErrCode = model.GetErrorCode(err)\n")
 
@@ -71,7 +73,7 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 		w.WriteString(common.Tab + "}\n")
 	}
 
-	w.WriteString(common.Tab + "return nil\n")
+	w.WriteString(common.Tab + "return &resp, nil\n")
 
 	w.WriteString("}\n")
 }
@@ -93,7 +95,7 @@ import (
 
 )
 
-func New%[1]sHandler(ucase usecase.%[1]sUseCase) proto.%[1]sHandler {
+func New%[1]sHandler(ucase usecase.%[1]sUseCase) proto.%[1]sServer {
 	return &%[2]s{ucase}
 }
 

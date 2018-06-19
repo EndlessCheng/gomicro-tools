@@ -135,8 +135,7 @@ import (
 	"context"
 	"os"
 
-	k8s "github.com/micro/kubernetes/go/micro"
-	"github.com/micro/go-micro"
+	"google.golang.org/grpc"
 )
 
 `)
@@ -151,7 +150,7 @@ func New%[1]sSvcRepository() %[1]sSvcRepository {
 }
 
 type %s struct {
-	client proto.%[1]sService
+	client proto.%[1]sClient
 }
 
 `, serviceNameUpper, implStructName))
