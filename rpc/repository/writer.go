@@ -133,9 +133,11 @@ func genRepository(dstFilePath string, parsedInterface *rpc.InterFace, dstName s
 
 import (
 	"context"
-	"os"
 
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+
+
 )
 
 `)
@@ -145,15 +147,23 @@ import (
 
 	implStructName := serviceName + "SvcRepository"
 	w.WriteString(fmt.Sprintf(`
-func New%[1]sSvcRepository() %[1]sSvcRepository {
-	// TODO
+func New%[2]sSvcRepository() %[2]sSvcRepository {
+	// TODO: fill the addr
+	%[1]sServiceAddr := utils.GetEnvWithDefault("", "")
+	conn, err := grpc.Dial(%[1]sServiceAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalln("dial to %[1]s service error:", err.Error())
+	}
+
+	client := proto.New%[2]sClient(conn)
+	return &%[3]s{client}
 }
 
-type %s struct {
-	client proto.%[1]sClient
+type %[3]s struct {
+	client proto.%[2]sClient
 }
 
-`, serviceNameUpper, implStructName))
+`, serviceName, serviceNameUpper, implStructName))
 
 	for _, method := range parsedInterface.Methods {
 		writeMethod(w, implStructName, method)

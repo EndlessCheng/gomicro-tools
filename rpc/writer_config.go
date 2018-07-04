@@ -16,6 +16,10 @@ func MapGoTypeToProtoType(goTypeName string) string {
 		return "int64"
 	case "uint":
 		return "uint64"
+	case "float32":
+		return "float"
+	case "float64":
+		return "double"
 	case "error":
 		return "int32"
 	default:
