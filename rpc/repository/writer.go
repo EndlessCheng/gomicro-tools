@@ -152,7 +152,7 @@ func New%[2]sSvcRepository() %[2]sSvcRepository {
 	%[1]sServiceAddr := utils.GetEnvWithDefault("", "")
 	conn, err := grpc.Dial(%[1]sServiceAddr, grpc.WithInsecure())
 	if err != nil {
-		log.Fatalln("dial to %[1]s service error:", err.Error())
+		log.WithError(err).Fatalln("连接 %[1]s 微服务失败（可能是环境变量配置错误）")
 	}
 
 	client := proto.New%[2]sClient(conn)
