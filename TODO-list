@@ -5,3 +5,41 @@ views
 // 直接生成一个 handler 目录
 
 ucase_test
+
+
+
+type HashID string
+
+
+/proto/interface/usecase.go
+/proto/interface/xxxmodel.go
+
+
+小写
+
+
+
+http/handler
+
+func getResultMap() {
+
+}
+
+
+
+main.go
+
+模板
+
+func main() {
+   // todo
+
+
+   usecase...
+
+   server...
+
+
+}
+
+

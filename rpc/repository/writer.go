@@ -115,6 +115,14 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 
 	w.WriteString(fmt.Sprintf("%sresp, err := r.client.%s(context.TODO(), &req)\n", common.Tab, method.Name))
 
+	w.WriteString(common.Tab + "if err != nil {\n")
+	w.WriteString(common.Tab + common.Tab + fmt.Sprintf("log.WithError(err).Errorln(\"[grpc.%s] error with args:\"", method.Name))
+	for _, arg := range method.Parameters {
+		w.WriteString(", " + arg.Name)
+	}
+	w.WriteString(")\n")
+	w.WriteString(common.Tab + "}\n")
+
 	w.WriteString(common.Tab + "return ")
 	writeMethodReturns(w, method.Returns)
 	w.WriteString("\n}\n")
