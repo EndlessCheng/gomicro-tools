@@ -3,9 +3,9 @@ package repository
 import (
 	"bufio"
 
+	"fmt"
 	"gomicro-tools/common"
 	"gomicro-tools/rpc"
-	"fmt"
 	"strings"
 )
 
@@ -160,7 +160,7 @@ func New%[2]sSvcRepository() %[2]sSvcRepository {
 	%[1]sServiceAddr := utils.GetEnvWithDefault("", "")
 	conn, err := grpc.Dial(%[1]sServiceAddr, grpc.WithInsecure())
 	if err != nil {
-		log.WithError(err).Fatalln("连接 %[1]s 微服务失败（可能是环境变量配置错误）")
+		log.WithError(err).Fatalln("连接 %[1]s 微服务失败")
 	}
 
 	client := proto.New%[2]sClient(conn)
@@ -170,12 +170,11 @@ func New%[2]sSvcRepository() %[2]sSvcRepository {
 type %[3]s struct {
 	client proto.%[2]sClient
 }
-
-`, serviceName, serviceNameUpper, implStructName))
+`, serviceName, serviceNameUpper, implStructName)) // （可能是环境变量配置错误）
 
 	for _, method := range parsedInterface.Methods {
-		writeMethod(w, implStructName, method)
 		w.WriteString("\n")
+		writeMethod(w, implStructName, method)
 	}
 
 	w.Flush()

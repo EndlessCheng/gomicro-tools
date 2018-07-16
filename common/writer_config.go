@@ -1,8 +1,8 @@
 package common
 
 import (
-	"strings"
 	"regexp"
+	"strings"
 )
 
 var Tab = strings.Repeat(" ", 4)

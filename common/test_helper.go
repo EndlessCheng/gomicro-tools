@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 )
 
 type tNode struct {
@@ -33,7 +33,6 @@ func (n tNode) runExpects(expects []func()) {
 			n.run()
 		}
 		return
-
 
 		gomock.InOrder()
 	}

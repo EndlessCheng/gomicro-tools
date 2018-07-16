@@ -1,11 +1,11 @@
 package handler
 
 import (
-	"gomicro-tools/rpc"
-	"strings"
-	"gomicro-tools/common"
 	"bufio"
 	"fmt"
+	"gomicro-tools/common"
+	"gomicro-tools/rpc"
+	"strings"
 )
 
 const (
@@ -95,10 +95,10 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 	writeUseCaseParams(w, method.Parameters)
 	w.WriteString(")\n")
 
-	w.WriteString(common.Tab)
-	w.WriteString(fmt.Sprintf("utils.LogIfInnerError(err, \"%s\", ", method.Name))
-	writeUseCaseParams(w, method.Parameters)
-	w.WriteString(")\n\n")
+	//w.WriteString(common.Tab)
+	//w.WriteString(fmt.Sprintf("utils.LogIfInnerError(err, \"%s\", ", method.Name))
+	//writeUseCaseParams(w, method.Parameters)
+	//w.WriteString(")\n\n")
 
 	w.WriteString(common.Tab + "resp.ErrCode = model.GetErrorCode(err)\n")
 
@@ -108,6 +108,7 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 		w.WriteString(common.Tab + "}\n")
 	}
 
+	w.WriteString("\n")
 	w.WriteString(common.Tab + "return &resp, nil\n")
 
 	w.WriteString("}\n")
@@ -137,12 +138,11 @@ func New%[1]sHandler(ucase usecase.%[1]sUseCase) proto.%[1]sServer {
 type %[2]s struct {
 	ucase usecase.%[1]sUseCase
 }
-
 `, serviceNameUpper, implStructName))
 
 	for _, method := range parsedInterface.Methods {
-		writeMethod(w, implStructName, method)
 		w.WriteString("\n")
+		writeMethod(w, implStructName, method)
 	}
 
 	w.Flush()

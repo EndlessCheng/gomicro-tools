@@ -3,9 +3,9 @@ package rpc
 import (
 	"bufio"
 	"fmt"
-	"strings"
-	"path/filepath"
 	"gomicro-tools/common"
+	"path/filepath"
+	"strings"
 )
 
 func writeService(w *bufio.Writer, serviceName string, methods []*Method) {
@@ -65,5 +65,34 @@ func genMessages(protoFilePath string, parsedStructs []*Struct) {
 	}
 
 	err := w.Flush()
+	common.Check(err)
+}
+
+func genFullProto(protoFilePath string, parsedMethods []*Method, parsedStructs []*Struct) {
+	f := common.CreateFile(protoFilePath)
+	defer f.Close()
+
+	w := bufio.NewWriter(f)
+	_, err := w.WriteString("syntax = \"proto3\";\n\npackage proto;\n\n")
+	common.Check(err)
+
+	serviceName := filepath.Base(protoFilePath)
+	serviceName = strings.TrimSuffix(serviceName, filepath.Ext(serviceName))
+	serviceName = strings.Title(serviceName)
+	writeService(w, serviceName, parsedMethods)
+
+	for _, parsedStruct := range parsedStructs {
+		w.WriteString("\n")
+		writeMessage(w, parsedStruct.Name, parsedStruct.Members)
+	}
+
+	for _, method := range parsedMethods {
+		w.WriteString("\n")
+		writeMessage(w, RequestMessageType(method.Name), method.Parameters)
+		w.WriteString("\n")
+		writeMessage(w, ResponseMessageType(method.Name), method.Returns)
+	}
+
+	err = w.Flush()
 	common.Check(err)
 }

@@ -1,11 +1,11 @@
 package rpc
 
 import (
+	"fmt"
 	"go/ast"
 	"go/parser"
 	"go/token"
 	"gomicro-tools/common"
-	"fmt"
 )
 
 type Var struct {
@@ -133,5 +133,15 @@ func parseStructs(sourceCode string) []*Struct {
 
 		parsedStructs = append(parsedStructs, &Struct{structName, members})
 	}
+	return parsedStructs
+}
+
+func parseStructsFromCodes(sourceCode []string) []*Struct {
+	var parsedStructs []*Struct
+
+	for _, src := range sourceCode {
+		parsedStructs = append(parsedStructs, parseStructs(src)...)
+	}
+
 	return parsedStructs
 }
