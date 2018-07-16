@@ -19,7 +19,7 @@ func writeService(w *bufio.Writer, serviceName string, methods []*Method) {
 }
 
 func writeMessage(w *bufio.Writer, messageType string, parameters []*Var) {
-	w.WriteString(fmt.Sprintf("message %s {\n", messageType))
+	w.WriteString(fmt.Sprintf("message %s {\n", strings.Title(messageType)))
 	for i, parameter := range parameters {
 		w.WriteString(common.Tab)
 		if parameter.IsSlice {

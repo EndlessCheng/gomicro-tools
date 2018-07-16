@@ -129,16 +129,20 @@ func genHandler(dstFilePath string, parsedInterface *rpc.InterFace, dstName stri
 import (
 	"context"
 
+	"%[1]s/model"
+	"%[1]s/model/usecase"
+	"%[1]s/proto"
+
 )
 
-func New%[1]sHandler(ucase usecase.%[1]sUseCase) proto.%[1]sServer {
-	return &%[2]s{ucase}
+func New%[2]sHandler(ucase usecase.%[2]sUseCase) proto.%[2]sServer {
+	return &%[3]s{ucase}
 }
 
-type %[2]s struct {
-	ucase usecase.%[1]sUseCase
+type %[3]s struct {
+	ucase usecase.%[2]sUseCase
 }
-`, serviceNameUpper, implStructName))
+`, common.ProjectImportPrefix, serviceNameUpper, implStructName))
 
 	for _, method := range parsedInterface.Methods {
 		w.WriteString("\n")

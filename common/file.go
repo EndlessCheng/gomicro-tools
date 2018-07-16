@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"fmt"
 )
 
 // Exists reports whether the named file or directory exists.
@@ -20,7 +21,7 @@ func CreateFile(filePath string) *os.File {
 	err := os.MkdirAll(path.Dir(filePath), os.ModePerm)
 	Check(err)
 
-	if exists(filePath) {
+	if exists(filePath) && !Force {
 		filePath += ".gen"
 	}
 
@@ -32,7 +33,10 @@ func CreateFile(filePath string) *os.File {
 
 func ReadText(filePath string) string {
 	data, err := ioutil.ReadFile(filePath)
-	Check(err)
+	if err != nil {
+		fmt.Println("找不到文件:", filePath)
+		os.Exit(1)
+	}
 
 	return string(data)
 }

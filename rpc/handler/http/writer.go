@@ -39,14 +39,15 @@ import (
 
 	"github.com/labstack/echo"
 
+	"%[1]s/model/usecase"
 
 )
 
 type handler struct {
-	ucase usecase.%[1]s
+	ucase usecase.%[2]s
 }
 
-func Set%sHTTPHandler(e *echo.Echo, ucase usecase.%[1]s) {
+func Set%[3]sHTTPHandler(e *echo.Echo, ucase usecase.%[2]s) {
 	h := handler{ucase}
 
 	// TODO
@@ -63,7 +64,7 @@ func createAPIResultMap(err error) map[string]interface{} {
 		"msg":     msg,
 	}
 }
-`, parsedInterface.Name, serviceNameUpper))
+`, common.ProjectImportPrefix, strings.Title(parsedInterface.Name), serviceNameUpper))
 
 	for _, method := range parsedInterface.Methods {
 		w.WriteString("\n")

@@ -4,6 +4,8 @@ import (
 	"gomicro-tools/common"
 	"path"
 	"io/ioutil"
+	"fmt"
+	"os"
 )
 
 func GenProto(srcFilePath string, dstProtoFilePath string) {
@@ -25,6 +27,11 @@ func GenMessages(srcFilePath string, dstProtoFilePath string) {
 func GenFullProto(srcFilePath string, dstProtoFilePath string) {
 	sourceCode := common.ReadText(srcFilePath)
 	parsedInterface := ParseInterface(sourceCode)
+
+	if parsedInterface == nil {
+		fmt.Println("找不到 interface:", srcFilePath)
+		os.Exit(1)
+	}
 
 	dirName := path.Dir(srcFilePath)
 	fis, err := ioutil.ReadDir(dirName)

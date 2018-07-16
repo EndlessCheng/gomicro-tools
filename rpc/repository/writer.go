@@ -137,7 +137,7 @@ func genRepository(dstFilePath string, parsedInterface *rpc.InterFace, dstName s
 
 	w := bufio.NewWriter(f)
 
-	_, err := w.WriteString(`package repository
+	_, err := w.WriteString(fmt.Sprintf(`package repository
 
 import (
 	"context"
@@ -145,10 +145,11 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"%[1]s/proto"
 
 )
 
-`)
+`, common.ProjectImportPrefix))
 	common.Check(err)
 
 	writeServiceInterface(w, parsedInterface)
