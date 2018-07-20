@@ -95,10 +95,10 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 	writeUseCaseParams(w, method.Parameters)
 	w.WriteString(")\n")
 
-	//w.WriteString(common.Tab)
-	//w.WriteString(fmt.Sprintf("utils.LogIfInnerError(err, \"%s\", ", method.Name))
-	//writeUseCaseParams(w, method.Parameters)
-	//w.WriteString(")\n\n")
+	w.WriteString(common.Tab)
+	w.WriteString(fmt.Sprintf("utils.LogIfInnerError(err, \"%s\", ", method.Name))
+	writeUseCaseParams(w, method.Parameters)
+	w.WriteString(")\n\n")
 
 	w.WriteString(common.Tab + "resp.ErrCode = model.GetErrorCode(err)\n")
 

@@ -13,12 +13,14 @@ import (
 	"gomicro-tools/rpc/repository"
 	gmain "gomicro-tools/rpc/gmain"
 	"gomicro-tools/common"
+	"bufio"
 )
 
 const (
 	flagForce = "force"
 	flagAll   = "all"
 
+	flagInit        = "init"
 	flagMain        = "main"
 	flagProto       = "proto"
 	flagProtoRepo   = "proto_repository"
@@ -27,11 +29,16 @@ const (
 	flagDeploy      = "deploy"
 )
 
+const (
+	ucaseFilePath  = "proto/interface/usecase.go"
+	modelsFilePath = "proto/interface/models.go"
+)
+
 var (
 	projectName string
 
 	//force bool
-
+	genInitFiles     bool
 	genMain          bool
 	genProto         bool
 	genSvcRepository bool
@@ -41,8 +48,23 @@ var (
 	genDeploy bool
 )
 
+func initGoFile(filePath string, packageName string) {
+	f, err := os.Create(filePath)
+	common.Check(err)
+
+	w := bufio.NewWriter(f)
+	w.WriteString("package " + packageName + "\n\n\n")
+	w.Flush()
+}
+
 func gen() {
-	ucaseFilePath := "proto/interface/usecase.go"
+	if genInitFiles {
+		err := os.MkdirAll("proto/interface", os.ModePerm)
+		common.Check(err)
+		initGoFile(ucaseFilePath, "_interface")
+		initGoFile(modelsFilePath, "_interface")
+		return
+	}
 
 	if genMain {
 		dstPath := "main.go"
@@ -98,6 +120,10 @@ func main() {
 		},
 
 		cli.BoolFlag{
+			Name:  flagInit,
+			Usage: "create interface folder",
+		},
+		cli.BoolFlag{
 			Name:  flagAll,
 			Usage: "generate ALL files",
 		},
@@ -138,6 +164,7 @@ More infomation: $ gomicro-tools help`)
 
 		common.Force = c.Bool(flagForce)
 
+		genInitFiles = c.Bool(flagInit)
 		all := c.Bool(flagAll)
 		genMain = all || c.Bool(flagMain)
 		genProto = all || c.Bool(flagProto)

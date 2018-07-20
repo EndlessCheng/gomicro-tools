@@ -127,6 +127,7 @@ func parseStructs(sourceCode string) []*Struct {
 		}
 
 		structName := typeSpec.Name.Name
+		//fmt.Println("Found struct", structName)
 
 		structFieldList := structType.Fields.List
 		members := parseFieldList(structFieldList)
