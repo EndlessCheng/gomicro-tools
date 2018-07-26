@@ -63,6 +63,11 @@ func gen() {
 		common.Check(err)
 		initGoFile(ucaseFilePath, "_interface")
 		initGoFile(modelsFilePath, "_interface")
+
+		err = os.MkdirAll("proto/repository/mocks", os.ModePerm)
+		common.Check(err)
+		err = os.MkdirAll("model/repository/mocks", os.ModePerm)
+		common.Check(err)
 		return
 	}
 
@@ -121,7 +126,7 @@ func main() {
 
 		cli.BoolFlag{
 			Name:  flagInit,
-			Usage: "create interface folder",
+			Usage: "create interface and mocks folder",
 		},
 		cli.BoolFlag{
 			Name:  flagAll,

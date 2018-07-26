@@ -77,10 +77,8 @@ func init() {
 }
 
 func initDB(host, user, password, port, dbName string) {
-	var err error
 	connStr := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbName + "?parseTime=true&loc=Local"
-
-	db, err = sqlx.Open(driverName, connStr)
+	db, err := sqlx.Open(driverName, connStr)
 	if err == nil {
 		err = db.Ping()
 	}
