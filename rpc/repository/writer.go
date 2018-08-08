@@ -115,13 +115,14 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 
 	w.WriteString(fmt.Sprintf("%sresp, err := r.client.%s(context.TODO(), &req)\n", common.Tab, method.Name))
 
-	w.WriteString(common.Tab + "if err != nil {\n")
-	w.WriteString(common.Tab + common.Tab + fmt.Sprintf("log.WithError(err).Errorln(\"[grpc.%s] error with args:\"", method.Name))
-	for _, arg := range method.Parameters {
-		w.WriteString(", " + arg.Name)
-	}
-	w.WriteString(")\n")
-	w.WriteString(common.Tab + "}\n")
+	//w.WriteString(common.Tab + "if err != nil {\n")
+	//w.WriteString(common.Tab + common.Tab + fmt.Sprintf("log.WithError(err).Errorln(\"[grpc.%s] error with args:\"", method.Name))
+	//for _, arg := range method.Parameters {
+	//	w.WriteString(", " + arg.Name)
+	//}
+	//w.WriteString(")\n")
+	//w.WriteString(common.Tab + "}\n")
+	w.WriteString(common.Tab + "err = r.checkError(resp.GetErrCode(), err)\n")
 
 	w.WriteString(common.Tab + "return ")
 	writeMethodReturns(w, method.Returns)
@@ -141,10 +142,13 @@ func genRepository(dstFilePath string, parsedInterface *rpc.InterFace, dstName s
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"%[1]s/model"
 	"%[1]s/proto"
 
 )
@@ -170,6 +174,13 @@ func New%[2]sSvcRepository() %[2]sSvcRepository {
 
 type %[3]s struct {
 	client proto.%[2]sClient
+}
+
+func (r *%[3]s) checkError(errCode int32, err error) error {
+	if err == nil && errCode != model.ErrorCodeOK {
+		err = errors.New(fmt.Sprintf("gRPC 调用返回错误码: %%d", errCode))
+	}
+	return err
 }
 `, serviceName, serviceNameUpper, implStructName)) // （可能是环境变量配置错误）
 
