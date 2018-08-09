@@ -113,7 +113,7 @@ func writeMethod(w *bufio.Writer, structName string, method *rpc.Method) {
 	writeStructInitParams(w, method.Parameters)
 	w.WriteString("}\n")
 
-	w.WriteString(fmt.Sprintf("%sresp, err := r.client.%s(context.TODO(), &req)\n", common.Tab, method.Name))
+	w.WriteString(fmt.Sprintf("%sresp, err := r.client.%s(context.TODO(), &req, grpc.FailFast(false))\n", common.Tab, method.Name))
 
 	//w.WriteString(common.Tab + "if err != nil {\n")
 	//w.WriteString(common.Tab + common.Tab + fmt.Sprintf("log.WithError(err).Errorln(\"[grpc.%s] error with args:\"", method.Name))
@@ -144,9 +144,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 
 	"%[1]s/model"
 	"%[1]s/proto"
@@ -163,7 +165,11 @@ import (
 func New%[2]sSvcRepository() %[2]sSvcRepository {
 	// TODO: fill the addr
 	%[1]sServiceAddr := utils.GetEnvWithDefault("", "")
-	conn, err := grpc.Dial(%[1]sServiceAddr, grpc.WithInsecure())
+	conn, err := grpc.Dial(%[1]sServiceAddr, grpc.WithInsecure(), grpc.WithKeepaliveParams(keepalive.ClientParameters{
+		Time:                10 * time.Second,
+		Timeout:             10 * time.Second,
+		PermitWithoutStream: true,
+	}))
 	if err != nil {
 		log.WithError(err).Fatalln("连接 %[1]s 微服务失败")
 	}
