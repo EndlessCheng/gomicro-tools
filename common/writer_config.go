@@ -5,9 +5,10 @@ import (
 	"strings"
 	"path/filepath"
 	"os"
+	"fmt"
 )
 
-var Tab = strings.Repeat(" ", 4)
+var Tab = fmt.Sprintf("\t") // strings.Repeat(" ", 4)
 
 var Force bool
 
