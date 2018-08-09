@@ -29,6 +29,7 @@ import (
 	"net"
 	"os"
 	"strconv"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
@@ -36,6 +37,7 @@ import (
 	echoMiddleware "github.com/labstack/echo/middleware"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/keepalive"
 
 	httpHandler "%[1]s/handler/http"
 	"%[1]s/handler/rpc"
@@ -123,7 +125,9 @@ func runWebService(ucase usecase.%[2]s) {
 }
 
 func runGRPCService(ucase usecase.%[2]s) {
-	gRPCServer := grpc.NewServer()
+	gRPCServer := grpc.NewServer(grpc.KeepaliveParams(keepalive.ServerParameters{
+		Time: 10 * time.Second,
+	}))
 
 	proto.Register%[3]sServer(gRPCServer, rpc.New%[3]sHandler(ucase))
 
