@@ -81,13 +81,15 @@ func init() {
 func initDB(host, user, password, port, dbName string) {
 	var err error
 	connStr := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbName + "?parseTime=true&loc=Local"
-	db, err = sqlx.Open(driverName, connStr)
-	if err == nil {
-		err = db.Ping()
-	}
+	db, err = sqlx.Open(driverName, connStr) // don't shadow outside db
 	if err != nil {
-		log.WithError(err).Fatalf("sqlx system db connect error (%%s)", connStr)
+		log.WithError(err).Fatalf("could not get a connection (%%s)", connStr)
 	}
+	if err := db.Ping(); err != nil {
+		db.Close()
+		log.WithError(err).Fatalf("could not establish a good connection (%%s)", connStr)
+	}
+	db.SetConnMaxLifetime(10 * time.Minute) // close expired connections
 }
 
 func setUpLogger() {
