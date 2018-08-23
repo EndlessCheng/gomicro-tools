@@ -72,13 +72,13 @@ func init() {
 	mysqlUser := utils.GetEnvWithDefault("MYSQL_USER", "") // TODO
 	mysqlPass := utils.GetEnvWithDefault("MYSQL_PASS", "") // TODO
 	mysqlDBName := utils.GetEnvWithDefault("MYSQL_DBNAME", "") // TODO
-	initDB(mysqlHost, mysqlUser, mysqlPass, mysqlPort, mysqlDBName)
+	initDB(mysqlHost, mysqlPort, mysqlUser, mysqlPass, mysqlDBName)
 	log.Infoln("OK")
 
 	setUpLogger()
 }
 
-func initDB(host, user, password, port, dbName string) {
+func initDB(host, port, user, password, dbName string) {
 	var err error
 	connStr := user + ":" + password + "@tcp(" + host + ":" + port + ")/" + dbName + "?parseTime=true&loc=Local"
 	db, err = sqlx.Open(driverName, connStr) // don't shadow outside db
