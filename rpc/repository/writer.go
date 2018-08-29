@@ -142,7 +142,6 @@ func genRepository(dstFilePath string, parsedInterface *rpc.InterFace, dstName s
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"time"
 
@@ -184,7 +183,7 @@ type %[3]s struct {
 
 func (r *%[3]s) checkError(errCode int32, err error) error {
 	if err == nil && errCode != model.ErrorCodeOK {
-		err = errors.New(fmt.Sprintf("gRPC 调用返回错误码: %%d", errCode))
+		err = fmt.Errorf("%[1]s 微服务: gRPC 调用返回错误码: %%d", errCode)
 	}
 	return err
 }
