@@ -25,7 +25,11 @@ func writeMessage(w *bufio.Writer, messageType string, parameters []*Var) {
 		if parameter.IsSlice {
 			w.WriteString("repeated ")
 		}
-		w.WriteString(fmt.Sprintf("%s %s = %d;\n", MapGoTypeToProtoType(parameter.Type), MapGoNameToProtoName(parameter.Name), i+1))
+		index := i + 1
+		if parameter.Name == "err" { // TODO: 重构一下
+			index = 60
+		}
+		w.WriteString(fmt.Sprintf("%s %s = %d;\n", MapGoTypeToProtoType(parameter.Type), MapGoNameToProtoName(parameter.Name), index))
 	}
 	w.WriteString("}\n")
 }
